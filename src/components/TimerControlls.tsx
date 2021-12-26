@@ -1,4 +1,5 @@
 import { Button, Box, Center, Text } from "@chakra-ui/react";
+import { TIMER_TYPE } from "../common/constants";
 
 const TimerControlls = ({
   startTimer,
@@ -18,7 +19,8 @@ const TimerControlls = ({
       <Box>
         <Center>
           <Text fontSize="4xl">
-            {timerType === 0 && (
+            {timerType === TIMER_TYPE.LOADING && <span>{"Loading..."}</span>}
+            {timerType === TIMER_TYPE.FOCUS && (
               <>
                 {isStart ? (
                   <span>{"👨‍💻作業中👨‍💻"}</span>
@@ -27,7 +29,7 @@ const TimerControlls = ({
                 )}
               </>
             )}
-            {timerType === 1 && <span>{"🛌休憩中🛌"}</span>}
+            {timerType === TIMER_TYPE.REST && <span>{"🛌休憩中🛌"}</span>}
           </Text>
         </Center>
       </Box>
