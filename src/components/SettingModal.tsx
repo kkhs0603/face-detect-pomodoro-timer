@@ -39,7 +39,7 @@ const SettingModal = ({
         <ModalCloseButton />
         <ModalBody>
           <Box>
-            <Text>作業時間</Text>
+            <Text>作業時間(分)</Text>
             <NumberInput
               defaultValue={focusTime / 60}
               onChange={(val) => setTmpFocusTime(Number(val) * 60)}

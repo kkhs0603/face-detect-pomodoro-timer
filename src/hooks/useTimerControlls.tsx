@@ -140,6 +140,8 @@ const useTimerControlls = () => {
       stopTimer();
       setIsStart(false);
     } else {
+      if (timerType === TIMER_TYPE.LOADING || timerType === TIMER_TYPE.STOP)
+        return;
       startTimer();
       setIsStart(true);
     }
