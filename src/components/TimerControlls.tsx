@@ -6,20 +6,17 @@ const TimerControlls = ({
   stopTimer,
   resetTimer,
   isStart,
+  setIsStart,
   timerType,
+  setTimerType,
 }) => {
   return (
     <Box>
-      {/* <Button onClick={startTimer} isDisabled={isStart}>
-          START
-        </Button> */}
-      {/* <Button onClick={stopTimer} isDisabled={!isStart}>
-          STOP
-          </Button> */}
       <Box>
         <Center>
           <Text fontSize="4xl">
             {timerType === TIMER_TYPE.LOADING && <span>{"Loading..."}</span>}
+            {timerType === TIMER_TYPE.STOP && <span>{"停止中"}</span>}
             {timerType === TIMER_TYPE.FOCUS && (
               <>
                 {isStart ? (
@@ -34,12 +31,18 @@ const TimerControlls = ({
         </Center>
       </Box>
 
-      <Box>
-        {/* <Center>
+      <Box mt={10}>
+        <Center>
+          {/* <Button onClick={() => setIsStart(true)} isDisabled={isStart}>
+            START
+          </Button>
+          <Button onClick={() => setIsStart(false)} isDisabled={!isStart}>
+            STOP
+          </Button>
           <Button onClick={resetTimer} isDisabled={false}>
             RESET
-          </Button>
-        </Center> */}
+          </Button> */}
+        </Center>
       </Box>
     </Box>
   );

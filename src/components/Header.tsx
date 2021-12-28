@@ -1,17 +1,29 @@
 import React from "react";
-import {
-  Stack,
-  Heading,
-  Flex,
-  useDisclosure,
-  Progress,
-} from "@chakra-ui/react";
+import { Stack, Heading, Flex, Progress, Box, Button } from "@chakra-ui/react";
+import { SettingsIcon } from "@chakra-ui/icons";
+import SettingModal from "./SettingModal";
 type Props = {
   progressValue?: any;
+  focusTime: number;
+  restTime: number;
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  setTmpFocusTime: (val: number) => void;
+  onSubmitSetting: () => void;
+  setTmpRestTime: (val: number) => void;
 };
-const Header: React.FC<Props> = ({ progressValue }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  // console.log("prog", progressValue);
+const Header: React.FC<Props> = ({
+  progressValue,
+  focusTime,
+  restTime,
+  isOpen,
+  onOpen,
+  onClose,
+  setTmpFocusTime,
+  onSubmitSetting,
+  setTmpRestTime,
+}) => {
   return (
     <>
       <Flex
@@ -22,7 +34,6 @@ const Header: React.FC<Props> = ({ progressValue }) => {
         padding={6}
         bg="teal.500"
         color="white"
-        // {...props}
       >
         <Flex align="center">
           <Heading as="h1" size="lg">
@@ -30,21 +41,21 @@ const Header: React.FC<Props> = ({ progressValue }) => {
           </Heading>
         </Flex>
 
-        {/* <Box display={{ base: "block", md: "none" }} onClick={handleToggle}>
-        <HamburgerIcon />
-      </Box> */}
-
-        <Stack
-          direction={{ base: "column", md: "row" }}
-          display={{ base: isOpen ? "block" : "none", md: "flex" }}
-          width={{ base: "full", md: "auto" }}
-          alignItems="center"
-          flexGrow={1}
-          mt={{ base: 4, md: 0 }}
-        ></Stack>
+        <Button display={{ base: "block" }} onClick={onOpen} variant="link">
+          <SettingsIcon color="white" />
+        </Button>
       </Flex>
 
       <Progress value={progressValue} colorScheme="cyan" />
+      <SettingModal
+        isOpen={isOpen}
+        onClose={onClose}
+        focusTime={focusTime}
+        restTime={restTime}
+        setTmpFocusTime={setTmpFocusTime}
+        onSubmitSetting={onSubmitSetting}
+        setTmpRestTime={setTmpRestTime}
+      />
     </>
   );
 };

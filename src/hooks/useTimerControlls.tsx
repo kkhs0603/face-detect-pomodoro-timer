@@ -2,11 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import * as faceapi from "face-api.js";
 import Webcam from "react-webcam";
 import { TIMER_TYPE } from "../common/constants";
+import { useDisclosure } from "@chakra-ui/react";
 
 const useTimerControlls = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [elapsedTime, setElapsedTime] = useState(0);
   const [focusTime, setFocusTime] = useState(60 * 25);
+  const [tmpFocusTime, setTmpFocusTime] = useState(focusTime);
   const [restTime, setRestTime] = useState(60 * 5);
+  const [tmpRestTime, setTmpRestTime] = useState(restTime);
   const [settingTime, setSettingTime] = useState(focusTime);
   const [timerType, setTimerType] = useState(TIMER_TYPE.LOADING);
   const [timerId, setTimerId] = useState<NodeJS.Timeout>();
@@ -24,21 +28,24 @@ const useTimerControlls = () => {
   const [isFaceDetected, setIsFaceDetected] = useState(false);
 
   const startTimer = () => {
-    setIsStart(true);
+    if (timerId) return;
     const id = setInterval(() => {
       setElapsedTime((t) => t + 1);
-      () => clearInterval(id);
+      // () => clearInterval(id);
     }, 1000);
     setTimerId(id);
+    setIsStart(true);
   };
   const stopTimer = () => {
-    clearInterval(timerId);
     setIsStart(false);
+    clearInterval(timerId);
+    setTimerId(null);
   };
   const resetTimer = () => {
     clearInterval(timerId);
-    setIsStart(false);
+    setTimerId(null);
     setElapsedTime(0);
+    setIsStart(false);
   };
 
   useEffect(() => {
@@ -76,7 +83,7 @@ const useTimerControlls = () => {
     canvas.height = webcam.videoHeight;
     const video = webcamRef.current.video;
     if (!video) return;
-    if (timerType === TIMER_TYPE.LOADING) setTimerType(TIMER_TYPE.FOCUS);
+    if (timerType === TIMER_TYPE.LOADING) setTimerType(TIMER_TYPE.STOP);
     (async function draw() {
       const detectionsWithExpressions = await faceapi
         .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
@@ -95,18 +102,65 @@ const useTimerControlls = () => {
   };
 
   useEffect(() => {
-    if (timerType == TIMER_TYPE.FOCUS) {
-      //顔認証が外れてタイマーを止めるまでの遊び時間
-      const timer = setTimeout(() => {
-        if (isFaceDetected) {
-          if (!isStart) startTimer();
-        } else {
-          if (isStart) stopTimer();
-        }
-      }, 500);
-      return () => clearInterval(timer);
+    if (isStart) {
+      if (timerType == TIMER_TYPE.FOCUS) {
+        //顔認証が外れてタイマーを止めるまでの遊び時間
+        const timer = setTimeout(() => {
+          if (isFaceDetected) {
+            startTimer();
+          } else {
+            stopTimer();
+          }
+        }, 500);
+        return () => clearInterval(timer);
+      } else if (timerType == TIMER_TYPE.STOP) {
+        setTimerType(TIMER_TYPE.FOCUS);
+        startTimer();
+      }
+    } else {
+      if (timerType == TIMER_TYPE.FOCUS) {
+        //顔認証が外れてタイマーを止めるまでの遊び時間
+        const timer = setTimeout(() => {
+          if (isFaceDetected) {
+            if (!isStart) startTimer();
+          } else {
+            if (isStart) stopTimer();
+          }
+        }, 500);
+        return () => clearInterval(timer);
+      } else if (timerType == TIMER_TYPE.STOP) {
+        setTimerType(TIMER_TYPE.FOCUS);
+        startTimer();
+      }
     }
-  }, [isFaceDetected]);
+  }, [isFaceDetected, isStart]);
+
+  useEffect(() => {
+    if (isOpen) {
+      stopTimer();
+      setIsStart(false);
+    } else {
+      startTimer();
+      setIsStart(true);
+    }
+  }, [isOpen]);
+
+  const onSubmitSetting = () => {
+    // stopTimer();
+    if (tmpFocusTime !== focusTime) {
+      setFocusTime(tmpFocusTime);
+    }
+    if (tmpRestTime !== restTime) {
+      setRestTime(tmpRestTime);
+    }
+    if (timerType == TIMER_TYPE.FOCUS) {
+      setSettingTime(tmpFocusTime);
+    } else if (timerType == TIMER_TYPE.REST) {
+      setSettingTime(tmpRestTime);
+    }
+    // startTimer();
+    onClose();
+  };
 
   return {
     startTimer,
@@ -121,6 +175,20 @@ const useTimerControlls = () => {
     setIsFaceDetected,
     timerType,
     progressValue,
+    focusTime,
+    setFocusTime,
+    restTime,
+    setRestTime,
+    isOpen,
+    onOpen,
+    onClose,
+    onSubmitSetting,
+    setIsStart,
+    setTimerType,
+    tmpFocusTime,
+    setTmpFocusTime,
+    tmpRestTime,
+    setTmpRestTime,
   };
 };
 
